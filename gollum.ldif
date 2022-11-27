@@ -1,0 +1,66 @@
+# https://ubuntu.com/server/docs/service-ldap
+#-------------------------------------------------------------------------------
+#
+# Base OU
+#
+#-------------------------------------------------------------------------------
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+# 
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+#-------------------------------------------------------------------------------
+#
+# Group wiki
+#
+#-------------------------------------------------------------------------------
+dn: cn=wiki,ou=Groups,dc=example,dc=com
+objectClass: posixGroup
+cn: wiki
+gidNumber: 5000
+
+#-------------------------------------------------------------------------------
+#
+# User user1
+#
+#-------------------------------------------------------------------------------
+dn: uid=user1,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: user1
+# sn-> surname
+sn: User1
+#givenName: Givenname
+# cn -> common name
+cn: Givenname User1
+#displayName: Givenname User1
+##
+uidNumber: 10000
+gidNumber: 5000
+##
+# $ slappasswd
+userPassword: {SSHA}XXXXXXXX
+# gecos -> General Comprehensive Operating System -> 
+# see https://en.wikipedia.org/wiki/Gecos_field
+# see also https://backstage.forgerock.com/docs/ds/7/schemaref/at-gecos.html
+#gecos: Givenname User1
+loginShell: /bin/bash
+homeDirectory: /home/user1
+
+#-------------------------------------------------------------------------------
+#
+# User user2
+#
+#-------------------------------------------------------------------------------
+# ...
+#-------------------------------------------------------------------------------
+#
+# User user3
+#
+#-------------------------------------------------------------------------------
+# ...
