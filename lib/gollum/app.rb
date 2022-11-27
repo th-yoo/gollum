@@ -216,7 +216,7 @@ module Precious
       end
 
       get '/edit/*' do
-        forbid unless @allow_editing
+        forbid unless @allow_editing && @user_authed
         wikip = wiki_page(params[:splat].first)
         @name = wikip.fullname
         @path = wikip.path
@@ -239,6 +239,7 @@ module Precious
 
         wiki = wiki_new
         halt 405 unless wiki.allow_uploads
+        forbid unless @user_authed
 
         if params[:file]
           fullname = params[:file][:filename]
@@ -282,6 +283,7 @@ module Precious
       post '/rename/*' do
         wikip = wiki_page(params[:splat].first)
         halt 500 if wikip.nil?
+        forbid unless @user_authed
         wiki   = wikip.wiki
         page   = wikip.page
         rename = params[:rename]
@@ -325,6 +327,7 @@ module Precious
         path      = "/#{clean_url(sanitize_empty_params(params[:path]))}"
         wiki      = wiki_new
         page      = wiki.page(::File.join(path, params[:page]))
+        forbid unless @user_authed
 
         return if page.nil?
         if etag != page.sha
@@ -344,7 +347,7 @@ module Precious
       end
 
       post '/delete/*' do
-        forbid unless @allow_editing
+        forbid unless @allow_editing && @user_authed
         wiki = wiki_new
         filepath = params[:splat].first
         unless filepath.nil?
@@ -381,6 +384,7 @@ module Precious
         path   = sanitize_empty_params(params[:path]) || ''
         format = params[:format].intern
         wiki   = wiki_new
+        forbid unless @user_authed
 
         path.gsub!(/^\//, '')
 
@@ -631,7 +635,7 @@ module Precious
       elsif @redirects_enabled && redirect_path = wiki.redirects[fullpath]
         redirect to("#{encodeURIComponent(redirect_path)}?redirected_from=#{encodeURIComponent(fullpath)}")
       else
-        if @allow_editing
+        if @allow_editing && @user_authed
           path = fullpath[-1] == '/' ? "#{fullpath}#{wiki.index_page}" : fullpath # Append default index page if no page name is supplied
           redirect to("/gollum/create/#{clean_url(encodeURIComponent(path))}")
         else
