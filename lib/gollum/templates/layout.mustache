@@ -76,6 +76,43 @@
     mermaid.initialize(mermaid_conf);
   </script>
   {{/mermaid}}
+
+<script>
+const html = (strings, ...values) => String.raw({raw:strings}, ...values);
+class uml_diagram_t extends HTMLElement {
+	constructor()
+	{
+		super();
+		this.attachShadow({mode: 'open'});
+		this.shadowRoot.innerHTML = html`<p>Loading...</p>`;
+
+		this._src = this.getAttribute('src');
+		this.onSrc();
+	}
+	get src() { return this._src; }
+
+	async onSrc()
+	{
+		if (!this.src) return;
+
+		const resp = await fetch(this.src);
+		this.shadowRoot.innerHTML = await resp.text();
+	}
+
+	attributeChangedCallback(name, oldValue, newValue)
+	{
+		if (name !== 'src') return;
+		if (oldValue === newValue) return;
+		this._src = newValue;
+
+		this.onSrc();
+	}
+	static get observedAttributes() { return ['src']; }
+}
+
+window.customElements.define('uml-diagram', uml_diagram_t);
+
+</script>
   
   <title>{{title}}</title>
 </head>
